@@ -1,7 +1,9 @@
 package com.sr3launcher;
 
 import android.app.Activity;
+import android.animation.ObjectAnimator;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +13,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
@@ -26,6 +29,8 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.view.animation.Animation;
+import android.view.animation.AlphaAnimation;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -231,6 +236,8 @@ public class LauncherActivity extends Activity {
     private TextView upSharpLabel;
     private Switch swCasPs;
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private LinearLayout setupCard, setupBody;
+    private static final String SHIZUKU_PKG = "moe.shizuku.privileged.api";
 
     // ---------------------------------------------------------------- UI helpers
 
@@ -296,6 +303,120 @@ public class LauncherActivity extends Activity {
         LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(-1, -2);
         rp.bottomMargin = dp(8);
         parent.addView(row, rp);
+    }
+
+    // ---------------------------------------------------------------- первичная настройка
+
+    private boolean pkgInstalled(String p) {
+        try { getPackageManager().getPackageInfo(p, 0); return true; } catch (Exception e) { return false; }
+    }
+
+    private int globalInt(String key) {
+        try { return Settings.Global.getInt(getContentResolver(), key, -1); } catch (Exception e) { return -1; }
+    }
+
+    private void open(Intent i) {
+        try { startActivity(i); } catch (Exception e) { say("Не удалось открыть: " + e.getMessage()); }
+    }
+
+    private void openSettings(String action) {
+        open(new Intent(action).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+    }
+
+    private void openShizuku() {
+        Intent i = getPackageManager().getLaunchIntentForPackage(SHIZUKU_PKG);
+        if (i == null) { say("Shizuku не установлен."); return; }
+        open(i);
+    }
+
+    private void downloadShizuku() {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, android.net.Uri.parse("market://details?id=" + SHIZUKU_PKG)));
+        } catch (Exception e) {
+            open(new Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://github.com/RikkaApps/Shizuku/releases")));
+        }
+    }
+
+    private void launchGameOnce() {
+        Intent i = new Intent(Intent.ACTION_MAIN);
+        i.addCategory(Intent.CATEGORY_LAUNCHER);
+        i.setClassName(PKG, GAME_ACTIVITY);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        open(i);
+    }
+
+    private interface Act { void go(); }
+
+    private void setupRow(String title, String hint, boolean ok, String btn, final Act act) {
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        TextView mark = text(ok ? "✓" : "✕", 18, ok ? 0xFF5BD68A : 0xFFFF6B7A, true);
+        row.addView(mark, new LinearLayout.LayoutParams(dp(26), -2));
+        LinearLayout names = new LinearLayout(this);
+        names.setOrientation(LinearLayout.VERTICAL);
+        names.addView(text(title, 14, TEXT, false));
+        if (!ok && hint != null) names.addView(text(hint, 11, MUTED, false));
+        row.addView(names, new LinearLayout.LayoutParams(0, -2, 1f));
+        if (!ok && btn != null && act != null) {
+            Button b = button(btn, false);
+            b.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+            b.setPadding(dp(12), dp(6), dp(12), dp(6));
+            b.setOnClickListener(new View.OnClickListener() { @Override public void onClick(View v) { act.go(); } });
+            row.addView(b, new LinearLayout.LayoutParams(-2, -2));
+        }
+        LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(-1, -2);
+        rp.bottomMargin = dp(8);
+        setupBody.addView(row, rp);
+    }
+
+    /** Пересчитывает шаги первичной настройки и прячет карточку, когда всё готово. */
+    private void refreshSetup() {
+        if (setupBody == null) return;
+        setupBody.removeAllViews();
+        boolean shInst = pkgInstalled(SHIZUKU_PKG);
+        boolean running = Fs.running();
+        boolean perm = Fs.ready();
+        boolean dev = globalInt(Settings.Global.DEVELOPMENT_SETTINGS_ENABLED) == 1;
+        boolean adb = globalInt(Settings.Global.ADB_ENABLED) == 1 || globalInt("adb_wifi_enabled") == 1;
+        boolean gameInst = pkgInstalled(PKG);
+        boolean prefs = perm && gameInst && Fs.exists(prefPath);
+
+        if (perm && gameInst && prefs) { setupCard.setVisibility(View.GONE); return; }
+        setupCard.setVisibility(View.VISIBLE);
+        if (!perm && !Fs.rootChecking()) showAccessBanner();
+
+        boolean viaRoot = Fs.rootOk();
+        setupBody.addView(text("Лаунчеру нужен доступ к папке игры: через Shizuku или через root. Пройдите шаги сверху вниз.", 11, MUTED, false));
+        LinearLayout.LayoutParams gap = new LinearLayout.LayoutParams(-1, dp(8));
+        setupBody.addView(new View(this), gap);
+
+        if (viaRoot) {
+            setupRow("Root-доступ получен", null, true, null, null);
+        } else {
+            setupRow("Есть root? Выдайте его лаунчеру",
+                Fs.rootChecking() ? "Проверяю root…" : "В Magisk/KernelSU/APatch разрешите root для «SR3 Лаунчер» и нажмите «Проверить». Тогда Shizuku не нужен",
+                false, "Проверить", new Act() { public void go() { Fs.retryRoot(); refreshSetup(); } });
+            setupRow("Или Shizuku установлен", "Скачайте приложение Shizuku (Google Play или GitHub)", shInst, "Скачать", new Act() { public void go() { downloadShizuku(); } });
+            if (!running) {
+                setupRow("Режим разработчика включён",
+                    "Настройки → О телефоне → «Номер сборки», нажмите 7 раз", dev, "О телефоне",
+                    new Act() { public void go() { openSettings(Settings.ACTION_DEVICE_INFO_SETTINGS); } });
+                setupRow("Отладка включена (беспроводная или по USB)",
+                    "Для разработчиков → «Беспроводная отладка» (нужен Wi‑Fi) или «Отладка по USB»", adb, "Для разработчиков",
+                    new Act() { public void go() { openSettings(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS); } });
+            }
+            setupRow("Shizuku запущен",
+                "В Shizuku: «Запуск через беспроводную отладку» → «Сопряжение» → «Запустить». После перезагрузки телефона запускать снова",
+                running, "Открыть Shizuku", new Act() { public void go() { openShizuku(); } });
+            setupRow("Доступ лаунчеру выдан",
+                running ? "Нажмите «Разрешить» в окне Shizuku. Если окна нет, включите лаунчер в списке приложений Shizuku" : "Сначала запустите Shizuku",
+                perm, running ? "Запросить" : null, new Act() { public void go() { Fs.requestAccess(); refreshSetup(); } });
+        }
+        setupRow("Игра установлена", "Установите Saints Row: The Third", gameInst, null, null);
+        setupRow("Файл настроек игры создан",
+            "Запустите игру один раз до главного меню и закройте её", prefs, gameInst && perm ? "Запустить игру" : null,
+            new Act() { public void go() { launchGameOnce(); } });
     }
 
     private void addExCard(LinearLayout parent, String title, Ex[] list) {
@@ -406,7 +527,7 @@ public class LauncherActivity extends Activity {
         String dir = "/sdcard/Android/data/" + PKG + "/files/feral_app_support";
         prefPath = dir + "/preferences";
         bakPath = dir + "/preferences.sr3launcher.bak";
-        Fs.init(new Runnable() { @Override public void run() { handler.post(new Runnable() { @Override public void run() { loadFromFile(); } }); } });
+        Fs.init(new Runnable() { @Override public void run() { handler.post(new Runnable() { @Override public void run() { loadFromFile(); refreshSetup(); } }); } });
 
         try {
             android.graphics.Rect r = getWindowManager().getMaximumWindowMetrics().getBounds();
@@ -418,12 +539,17 @@ public class LauncherActivity extends Activity {
         getWindow().setNavigationBarColor(BG);
         buildUi();
         loadFromFile();
+        refreshSetup();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (resGroup != null && Fs.ready() && !fsWasReady) { fsWasReady = true; loadFromFile(); }
+        if (setupBody != null) {
+            if (!Fs.ready()) Fs.init(new Runnable() { @Override public void run() { handler.post(new Runnable() { @Override public void run() { loadFromFile(); refreshSetup(); } }); } });
+            refreshSetup();
+        }
     }
 
     private boolean fsWasReady = false;
@@ -490,6 +616,12 @@ public class LauncherActivity extends Activity {
         scroll.addView(cols, new ViewGroup.LayoutParams(-1, -2));
         root.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1f));
 
+        // --- первичная настройка: проверка Shizuku, отладки и игры
+        setupCard = card(left, "Первичная настройка");
+        setupBody = new LinearLayout(this);
+        setupBody.setOrientation(LinearLayout.VERTICAL);
+        setupCard.addView(setupBody);
+
         // --- авто-подбор по железу
         hw = Hw.detect(this);
         LinearLayout cAuto = card(left, "Подбор под ваше железо");
@@ -508,6 +640,21 @@ public class LauncherActivity extends Activity {
         autoRow.addView(a30, ap2);
         cAuto.addView(autoRow);
         cAuto.addView(text("Стартовые значения по классу GPU. Это не замер: после подбора проверьте в игре со счётчиком FPS и поправьте вручную.", 11, MUTED, false));
+        cAuto.addView(text("Пресеты графики (FPS-лимит не меняют):", 12, TEXT, false));
+        LinearLayout presetRow = new LinearLayout(this);
+        presetRow.setOrientation(LinearLayout.HORIZONTAL);
+        for (int i = 0; i < PRESET_NAMES.length; i++) {
+            final int pi = i;
+            Button pb = button(PRESET_NAMES[i], false);
+            pb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+            pb.setPadding(dp(4), dp(8), dp(4), dp(8));
+            LinearLayout.LayoutParams pp = new LinearLayout.LayoutParams(0, -2, 1f);
+            pp.topMargin = dp(6);
+            if (i < PRESET_NAMES.length - 1) pp.rightMargin = dp(4);
+            presetRow.addView(pb, pp);
+            pb.setOnClickListener(new View.OnClickListener() { @Override public void onClick(View v) { applyPreset(pi); } });
+        }
+        cAuto.addView(presetRow);
         a60.setOnClickListener(new View.OnClickListener() { @Override public void onClick(View v) { autoTune(60); } });
         a30.setOnClickListener(new View.OnClickListener() { @Override public void onClick(View v) { autoTune(30); } });
 
@@ -645,8 +792,50 @@ public class LauncherActivity extends Activity {
         setContentView(root);
     }
 
+    private boolean noAccessShown;
+
     private void say(String s) {
         status.setText(s);
+        boolean bad = s != null && s.startsWith("Нет доступа");
+        status.clearAnimation();
+        if (bad) {
+            status.setTextColor(0xFFFF3B4E);
+            status.setTypeface(Typeface.DEFAULT_BOLD);
+            AlphaAnimation a = new AlphaAnimation(1f, 0.15f);
+            a.setDuration(500);
+            a.setRepeatMode(Animation.REVERSE);
+            a.setRepeatCount(Animation.INFINITE);
+            status.startAnimation(a);
+        } else {
+            status.setTextColor(MUTED);
+            status.setTypeface(Typeface.DEFAULT);
+        }
+    }
+
+    /** Баннер с предложением поставить и настроить Shizuku (или выдать root) и коротким гайдом. */
+    private void showAccessBanner() {
+        if (noAccessShown || isFinishing()) return;
+        noAccessShown = true;
+        String guide = "Лаунчер правит файл настроек игры, а Android не даёт обычным приложениям писать в папку другого приложения. Нужен один из двух способов:\n\n"
+            + "ВАРИАНТ A: root\nЕсли у вас Magisk, KernelSU или APatch, выдайте root-доступ приложению «SR3 Лаунчер» и нажмите «Проверить root».\n\n"
+            + "ВАРИАНТ B: Shizuku (без root)\n"
+            + "1. Установите Shizuku (кнопка «Скачать Shizuku»).\n"
+            + "2. Настройки → О телефоне → «Номер сборки», нажмите 7 раз (режим разработчика).\n"
+            + "3. Для разработчиков → включите «Беспроводная отладка» (нужен Wi‑Fi).\n"
+            + "4. В Shizuku: «Запуск через беспроводную отладку» → «Сопряжение», введите код из настроек, затем «Запустить».\n"
+            + "5. Вернитесь в лаунчер и нажмите «Разрешить» в окне Shizuku.\n\n"
+            + "Без root Shizuku придётся запускать заново после перезагрузки телефона.";
+        new AlertDialog.Builder(this)
+            .setTitle("Нет доступа к файлам игры")
+            .setMessage(guide)
+            .setPositiveButton("Скачать Shizuku", new android.content.DialogInterface.OnClickListener() {
+                public void onClick(android.content.DialogInterface d, int w) { downloadShizuku(); }
+            })
+            .setNeutralButton("Проверить root", new android.content.DialogInterface.OnClickListener() {
+                public void onClick(android.content.DialogInterface d, int w) { Fs.retryRoot(); refreshSetup(); }
+            })
+            .setNegativeButton("Позже", null)
+            .show();
     }
 
     // ---------------------------------------------------------------- file IO
@@ -690,7 +879,7 @@ public class LauncherActivity extends Activity {
         }
         String xml = readXml();
         if (xml == null) {
-            say(Fs.ready() ? "Файл настроек ещё не создан. Запустите игру один раз, затем откройте лаунчер снова." : Fs.problem());
+            say(Fs.ready() ? "Файл настроек ещё не создан. Запустите игру один раз, затем откройте лаунчер снова." : "Нет доступа к файлам игры (нужен root или Shizuku). Пройдите шаги в карточке «Первичная настройка».");
             resGroup.check(100);
             hudGroup.check(200);
             for (Opt o : opts) {
@@ -900,6 +1089,29 @@ public class LauncherActivity extends Activity {
         /* средний */ {3, 1, 1, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 1, 2, 20, 50, 1},
         /* слабый  */ {4, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 30, 60, 1},
     };
+
+    private static final String[] PRESET_NAMES = {"Минимум", "Низкие", "Средние", "Высокие", "Ультра"};
+    // формат тот же, что у AUTO: {разрешение, 14 параметров графики, резкость CAS, резкость апскейлера, динамическое разрешение}
+    private static final int[][] PRESETS = {
+        /* Минимум */ {4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 35, 65, 1},
+        /* Низкие  */ {3, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 30, 60, 1},
+        /* Средние */ {1, 1, 1, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 20, 50, 1},
+        /* Высокие */ {0, 2, 2, 2, 1, 2, 2, 3, 3, 3, 3, 3, 3, 2, 3, 10, 45, 0},
+        /* Ультра  */ {0, 2, 2, 3, 3, 3, 2, 3, 5, 3, 3, 3, 3, 3, 3, 0, 40, 0},
+    };
+
+    private void applyPreset(int n) {
+        int[] p = PRESETS[n];
+        resGroup.check(100 + Math.max(0, Math.min(resHeights.length - 1, p[0])));
+        for (int i = 0; i < opts.length; i++) {
+            int idx = Math.min(p[1 + i], opts[i].vals.size() - 1);
+            opts[i].spinner.setSelection(Math.max(0, idx));
+        }
+        sharpSeek.setProgress(p[15]);
+        upSharpSeek.setProgress(p[16]);
+        swDynRes.setChecked(p[17] == 1);
+        say("Пресет «" + PRESET_NAMES[n] + "» выбран. Нажмите «Сохранить» или «Играть». Проверьте FPS по счётчику в игре.");
+    }
 
     private void autoTune(int fps) {
         int[] p = (fps == 60 ? AUTO60 : AUTO30)[hw.tier];

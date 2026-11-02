@@ -15,6 +15,9 @@ final class Fs {
     private static Runnable onReady;
     private static String problem = "Запускаю доступ к файлам игры…";
     private static boolean listening;
+    /** 0 - ещё не проверяли, 1 - root выдан, -1 - root недоступен или отклонён. */
+    private static volatile int root = 0;
+    private static volatile boolean rootChecking;
 
     private static final Shizuku.OnRequestPermissionResultListener PERM = new Shizuku.OnRequestPermissionResultListener() {
         @Override public void onRequestPermissionResult(int requestCode, int grantResult) {
@@ -40,6 +43,35 @@ final class Fs {
         } catch (Throwable t) {
             problem = "Shizuku недоступен: " + t.getMessage();
         }
+        if (!shizukuReady() && root == 0) tryRoot();
+    }
+
+    /** Есть ли root-доступ (su), уже выданный лаунчеру. */
+    static boolean rootOk() { return root == 1; }
+
+    static boolean rootChecking() { return rootChecking; }
+
+    /** Повторная проверка root (например, после того как выдали доступ в Magisk/KernelSU). */
+    static void retryRoot() { if (root != 1) { root = 0; tryRoot(); } }
+
+    private static void tryRoot() {
+        if (rootChecking) return;
+        rootChecking = true;
+        new Thread(new Runnable() {
+            @Override public void run() {
+                int r = -1;
+                try {
+                    Process p = Runtime.getRuntime().exec(new String[] {"su", "-c", "id"});
+                    p.getOutputStream().close();
+                    String out = new String(drain(p.getInputStream()));
+                    if (p.waitFor() == 0 && out.contains("uid=0")) r = 1;
+                } catch (Throwable ignored) { }
+                root = r;
+                rootChecking = false;
+                if (r == 1 && onReady != null) onReady.run();
+                else if (onReady != null) onReady.run();
+            }
+        }, "root-check").start();
     }
 
     static void release() {
@@ -71,7 +103,21 @@ final class Fs {
         problem = "";
     }
 
-    static boolean ready() {
+    /** Запущен ли сервис Shizuku. */
+    static boolean running() {
+        try { return Shizuku.pingBinder(); } catch (Throwable t) { return false; }
+    }
+
+    /** Показывает окно запроса доступа Shizuku, если сервис запущен, а доступа ещё нет. */
+    static void requestAccess() {
+        try {
+            if (Shizuku.pingBinder() && Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
+                Shizuku.requestPermission(REQ);
+            }
+        } catch (Throwable ignored) { }
+    }
+
+    private static boolean shizukuReady() {
         try {
             return Shizuku.pingBinder() && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED;
         } catch (Throwable t) {
@@ -79,12 +125,18 @@ final class Fs {
         }
     }
 
+    static boolean ready() { return shizukuReady() || root == 1; }
+
     static String problem() {
         try { if (!ready()) check(); } catch (Throwable ignored) { }
+        if (root == 1) return "";
         return problem.length() == 0 ? "Нет доступа к файлам игры." : problem;
     }
 
     private static Process spawn(String[] cmd) throws Exception {
+        if (!shizukuReady() && root == 1) {
+            return Runtime.getRuntime().exec(new String[] {"su", "-c", cmd[cmd.length - 1]});
+        }
         Method m = Shizuku.class.getDeclaredMethod("newProcess", String[].class, String[].class, String.class);
         m.setAccessible(true);
         return (Process) m.invoke(null, cmd, null, null);
