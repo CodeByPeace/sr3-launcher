@@ -166,6 +166,13 @@ keyAlias=...
 keyPassword=...
 ```
 
+## Другие лаунчеры
+
+Та же идея для других портов Feral на Android:
+
+- [Tomb Raider Launcher](https://github.com/Tsifrokayf/tomb-raider-launcher): Tomb Raider (2013)
+- [Hitman Launcher](https://github.com/Tsifrokayf/hitman-launcher): Hitman: Absolution
+
 ## Отказ от ответственности
 
 Проект неофициальный и никак не связан с Feral Interactive, Deep Silver / Plaion, Volition и другими правообладателями.
