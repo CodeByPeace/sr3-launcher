@@ -10,7 +10,7 @@ android {
             applicationId 'com.sr3.launcher'
             buildConfigField 'String', 'GAME', '"sr3"'
             buildConfigField 'String', 'REPO', '"sr3-launcher"'
-            versionName '1.2'
+            versionName '1.2.1'
                 manifestPlaceholders = [appLabel: 'SR3 Лаунчер', gamePkg: 'com.feralinteractive.saintsrow3_android']
         }
         tr {
@@ -18,7 +18,7 @@ android {
             applicationId 'com.sr3.launcher.tombraider'
             buildConfigField 'String', 'GAME', '"tr"'
             buildConfigField 'String', 'REPO', '"tomb-raider-launcher"'
-            versionName '1.0'
+            versionName '1.1.1'
             manifestPlaceholders = [appLabel: 'Tomb Raider Лаунчер', gamePkg: 'com.feralinteractive.tombraider_android']
         }
         hm {
@@ -26,14 +26,14 @@ android {
             applicationId 'com.sr3.launcher.hitman'
             buildConfigField 'String', 'GAME', '"hm"'
             buildConfigField 'String', 'REPO', '"hitman-launcher"'
-            versionName '1.0'
+            versionName '1.1.1'
             manifestPlaceholders = [appLabel: 'Hitman Лаунчер', gamePkg: 'com.feralinteractive.hitmanabsolution_android']
         }
     }
     defaultConfig {
         minSdk 30
         targetSdk 34
-        versionCode 3
+        versionCode 5
     }
     buildTypes { release { minifyEnabled false } }
     lint { checkReleaseBuilds false; abortOnError false }

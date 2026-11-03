@@ -985,7 +985,7 @@ public class LauncherActivity extends Activity {
     // ---------------------------------------------------------------- производительность (root)
 
     private Spinner perfCore, perfPrio, perfZram, perfSwp;
-    private TextView perfInfo;
+    private TextView perfInfo, perfReport;
     private Perf.Info perfI;
     private boolean perfLoading;
     private List<String[]> perfCoreOpts = new ArrayList<String[]>();
@@ -1013,6 +1013,8 @@ public class LauncherActivity extends Activity {
         LinearLayout c = card(parent, "Производительность (нужен root)");
         perfInfo = text("Нужен root: выдайте его лаунчеру в карточке «Первичная настройка».", 12, MUTED, false);
         c.addView(perfInfo);
+        perfReport = text("", 11, MUTED, false);
+        c.addView(perfReport);
         perfCore = new Spinner(this); perfPrio = new Spinner(this); perfZram = new Spinner(this); perfSwp = new Spinner(this);
         List<String> l0 = new ArrayList<String>();
         l0.add("Все ядра (не менять)");
@@ -1052,7 +1054,23 @@ public class LauncherActivity extends Activity {
         if (Fs.rootOk()) perfRefresh();
     }
 
+    /** Итог последнего применения при запуске игры (скрипт пишет его в файл). */
+    private void perfShowReport() {
+        if (perfReport == null || !Fs.rootOk()) return;
+        new Thread(new Runnable() {
+            @Override public void run() {
+                final String r = Fs.suOut("cat /data/local/tmp/sr3l_perf.txt 2>/dev/null");
+                handler.post(new Runnable() {
+                    @Override public void run() {
+                        if (r != null && r.trim().length() > 0) perfReport.setText("Последний запуск: " + r.trim());
+                    }
+                });
+            }
+        }, "perf-report").start();
+    }
+
     private void perfRefresh() {
+        perfShowReport();
         if (perfInfo == null || perfLoading || perfI != null || !Fs.rootOk()) return;
         perfLoading = true;
         new Thread(new Runnable() {
@@ -1095,7 +1113,7 @@ public class LauncherActivity extends Activity {
         String mask = Perf.mask(perfI, perfCoreKey());
         int nice = Perf.PRIO_NICE[Math.max(0, Math.min(Perf.PRIO_NICE.length - 1, perfPrio.getSelectedItemPosition()))];
         if (mask == null && nice == 0) return;
-        Fs.suDetached(Perf.script(PKG, mask, nice, 90, 12, false));
+        Fs.suDetached("(" + Perf.script(PKG, mask, nice, 90, 12, true) + ") > /data/local/tmp/sr3l_perf.txt 2>&1");
     }
 
     private void perfApplyNow() {
@@ -1994,6 +2012,23 @@ public class LauncherActivity extends Activity {
                 i.addCategory(Intent.CATEGORY_LAUNCHER);
                 i.setClassName(PKG, GAME_ACTIVITY);
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                if (Fs.ready()) {
+                    // через оболочку надёжнее: HyperOS иногда не даёт фоновому приложению стартовать чужую activity
+                    new Thread(new Runnable() {
+                        @Override public void run() {
+                            final String out = Fs.rootOk() ? Fs.suOut("am start -n " + PKG + "/" + GAME_ACTIVITY) : null;
+                            final int rc = out != null ? (out.contains("Error") || out.contains("Exception") ? 1 : 0)
+                                : Fs.sh("am start -n " + PKG + "/" + GAME_ACTIVITY);
+                            handler.post(new Runnable() {
+                                @Override public void run() {
+                                    if (rc == 0) finishAndRemoveTask();
+                                    else say("Не удалось запустить игру: " + (out == null ? "код " + rc : out.trim()));
+                                }
+                            });
+                        }
+                    }, "play").start();
+                    return;
+                }
                 try {
                     startActivity(i);
                     finishAndRemoveTask();

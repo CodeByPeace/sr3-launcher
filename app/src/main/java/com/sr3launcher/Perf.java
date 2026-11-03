@@ -131,11 +131,16 @@ final class Perf {
         s.append("r=0;while [ $r -lt ").append(rounds).append(" ];do ");
         s.append("for t in /proc/$pid/task/*;do tid=${t##*/};");
         if (mask != null) s.append("taskset -p ").append(mask).append(" $tid >/dev/null 2>&1;");
-        if (nice != 0) s.append("renice -n ").append(nice).append(" -p $tid >/dev/null 2>&1;");
+        // renice -n в toybox относительный, поэтому считаем разницу с текущим значением потока
+        if (nice != 0) {
+            s.append("st=$(cat /proc/$pid/task/$tid/stat 2>/dev/null);st=${st##*) };set -- $st;cur=${17};");
+            s.append("[ -n \"$cur\" ]&&[ \"$cur\" -ne ").append(nice).append(" ]&&renice -n $((").append(nice).append("-cur)) -p $tid >/dev/null 2>&1;");
+        }
         s.append("done;r=$((r+1));[ $r -lt ").append(rounds).append(" ]&&sleep 5;[ -d /proc/$pid ]||exit 0;done;");
         if (report) {
             s.append("n=0;for t in /proc/$pid/task/*;do n=$((n+1));done;");
-            s.append("echo \"потоков: $n; ядра главного потока: $(grep Cpus_allowed_list /proc/$pid/status|cut -f2); приоритет: $(ps -o NI -p $pid|tail -n1|tr -d ' ')\";");
+            s.append("L=$(for t in /proc/$pid/task/*;do grep Cpus_allowed_list $t/status 2>/dev/null|cut -f2;done|sort|uniq -c|tr -s ' '|tr '\\n' ';');");
+            s.append("echo \"потоков: $n; ядра (потоков): $L приоритет: $(ps -o NI -p $pid|tail -n1|tr -d ' ')\";");
         }
         return s.toString();
     }
