@@ -165,6 +165,28 @@ final class Fs {
         }
     }
 
+    /** Выполняет команду от root (su) и возвращает вывод (stdout и stderr) или null. Нужен root. */
+    static String suOut(String cmd) {
+        if (root != 1) return null;
+        try {
+            Process p = Runtime.getRuntime().exec(new String[] {"su", "-c", "(" + cmd + ") 2>&1"});
+            p.getOutputStream().close();
+            byte[] d = drain(p.getInputStream());
+            p.waitFor();
+            return new String(d);
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    /** Запускает скрипт от root в фоне, он живёт дольше лаунчера. */
+    static void suDetached(String script) {
+        if (root != 1) return;
+        try {
+            Runtime.getRuntime().exec(new String[] {"su", "-c", "nohup sh -c " + q(script) + " >/dev/null 2>&1 &"});
+        } catch (Throwable ignored) { }
+    }
+
     static boolean exists(String path) {
         return sh("test -f " + q(path)) == 0;
     }
