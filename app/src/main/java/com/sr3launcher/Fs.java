@@ -13,7 +13,7 @@ import rikka.shizuku.Shizuku;
 final class Fs {
     private static final int REQ = 4711;
     private static Runnable onReady;
-    private static String problem = "Запускаю доступ к файлам игры…";
+    private static String problem = "Starting access to the game files…";
     private static boolean listening;
     /** 0 - ещё не проверяли, 1 - root выдан, -1 - root недоступен или отклонён. */
     private static volatile int root = 0;
@@ -41,7 +41,7 @@ final class Fs {
             }
             check();
         } catch (Throwable t) {
-            problem = "Shizuku недоступен: " + t.getMessage();
+            problem = "Shizuku unavailable: " + t.getMessage();
         }
         if (!shizukuReady() && root == 0) tryRoot();
     }
@@ -87,17 +87,17 @@ final class Fs {
     /** Проверяет Shizuku и при необходимости запрашивает доступ. */
     private static void check() {
         if (!Shizuku.pingBinder()) {
-            problem = "Shizuku не запущен. Откройте Shizuku, запустите его и вернитесь в лаунчер.";
+            problem = "Shizuku isn't running. Open Shizuku, start it, then come back to the launcher.";
             return;
         }
         if (Shizuku.isPreV11()) {
-            problem = "Версия Shizuku слишком старая.";
+            problem = "Shizuku version is too old.";
             return;
         }
         if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
-            problem = "Разрешите лаунчеру доступ в окне Shizuku (оно появилось сейчас).";
+            problem = "Allow the launcher access in the Shizuku window (it just appeared).";
             if (!Shizuku.shouldShowRequestPermissionRationale()) Shizuku.requestPermission(REQ);
-            else problem = "Доступ отклонён. Включите его для лаунчера в приложении Shizuku.";
+            else problem = "Access denied. Enable it for the launcher in the Shizuku app.";
             return;
         }
         problem = "";
@@ -130,7 +130,7 @@ final class Fs {
     static String problem() {
         try { if (!ready()) check(); } catch (Throwable ignored) { }
         if (root == 1) return "";
-        return problem.length() == 0 ? "Нет доступа к файлам игры." : problem;
+        return problem.length() == 0 ? "No access to the game files." : problem;
     }
 
     private static Process spawn(String[] cmd) throws Exception {
@@ -226,23 +226,23 @@ final class Fs {
     static byte[] read(String path) {
         lastReadError = "";
         lastReadVia = "";
-        if (!ready()) { lastReadError = "нет доступа к файлам игры"; return null; }
+        if (!ready()) { lastReadError = "no access to the game files"; return null; }
         StringBuilder why = new StringBuilder();
         for (String p : variants(path)) {
             try {
                 String st = shOut("stat -c %s " + q(p) + " 2>&1");
                 long expect;
                 try { expect = Long.parseLong(st); } catch (NumberFormatException e) {
-                    why.append(p).append(": ").append(st.length() == 0 ? "нет ответа" : st).append("\n");
+                    why.append(p).append(": ").append(st.length() == 0 ? "no response" : st).append("\n");
                     continue;
                 }
-                if (expect == 0) { why.append(p).append(": файл пустой (0 байт)\n"); continue; }
+                if (expect == 0) { why.append(p).append(": file is empty (0 bytes)\n"); continue; }
                 Process pr = spawn(new String[] {"sh", "-c", "cat " + q(p) + " 2>/dev/null"});
                 pr.getOutputStream().close();
                 byte[] d = drain(pr.getInputStream());
                 pr.waitFor();
                 if (d.length == expect) { lastReadVia = p; return d; }
-                why.append(p).append(": прочитано ").append(d.length).append(" из ").append(expect).append(" байт\n");
+                why.append(p).append(": read ").append(d.length).append(" of ").append(expect).append(" bytes\n");
             } catch (Throwable t) {
                 why.append(p).append(": ").append(t.getMessage()).append("\n");
             }

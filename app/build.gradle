@@ -11,7 +11,7 @@ android {
             buildConfigField 'String', 'GAME', '"sr3"'
             buildConfigField 'String', 'REPO', '"sr3-launcher"'
             versionName '1.2.1'
-                manifestPlaceholders = [appLabel: 'SR3 Лаунчер', gamePkg: 'com.feralinteractive.saintsrow3_android']
+                manifestPlaceholders = [appLabel: 'SR3 Launcher', gamePkg: 'com.feralinteractive.saintsrow3_android']
         }
         tr {
             dimension 'game'
@@ -19,7 +19,7 @@ android {
             buildConfigField 'String', 'GAME', '"tr"'
             buildConfigField 'String', 'REPO', '"tomb-raider-launcher"'
             versionName '1.1.1'
-            manifestPlaceholders = [appLabel: 'Tomb Raider Лаунчер', gamePkg: 'com.feralinteractive.tombraider_android']
+            manifestPlaceholders = [appLabel: 'Tomb Raider Launcher', gamePkg: 'com.feralinteractive.tombraider_android']
         }
         hm {
             dimension 'game'
@@ -27,7 +27,7 @@ android {
             buildConfigField 'String', 'GAME', '"hm"'
             buildConfigField 'String', 'REPO', '"hitman-launcher"'
             versionName '1.1.1'
-            manifestPlaceholders = [appLabel: 'Hitman Лаунчер', gamePkg: 'com.feralinteractive.hitmanabsolution_android']
+            manifestPlaceholders = [appLabel: 'Hitman Launcher', gamePkg: 'com.feralinteractive.hitmanabsolution_android']
         }
     }
     defaultConfig {

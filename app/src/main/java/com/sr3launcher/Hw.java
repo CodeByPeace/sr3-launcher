@@ -94,16 +94,16 @@ final class Hw {
         if (t < 0) t = ramMb >= 12000 && cores >= 8 ? 1 : (ramMb >= 6000 ? 2 : 3);
         if (ramMb > 0 && ramMb < 4000 && t < 3) t = Math.max(t, 2);
         tier = t;
-        tierName = new String[] {"флагман", "мощный", "средний", "слабый"}[t];
+        tierName = new String[] {"flagship", "high-end", "mid-range", "low-end"}[t];
     }
 
     String describe() {
         StringBuilder b = new StringBuilder();
-        b.append(gpu.length() > 0 ? gpu : "GPU не определён");
+        b.append(gpu.length() > 0 ? gpu : "GPU not detected");
         if (soc.length() > 0) b.append(" · ").append(soc);
-        b.append(" · ").append(cores).append(" ядер");
-        if (ramMb > 0) b.append(" · ").append(Math.round(ramMb / 1024.0)).append(" ГБ ОЗУ");
-        b.append("\nКласс: ").append(tierName);
+        b.append(" · ").append(cores).append(" cores");
+        if (ramMb > 0) b.append(" · ").append(Math.round(ramMb / 1024.0)).append(" GB RAM");
+        b.append("\nTier: ").append(tierName);
         return b.toString();
     }
 }

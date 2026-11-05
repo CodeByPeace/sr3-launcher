@@ -28,8 +28,8 @@ final class Updater {
         HttpURLConnection c = open("https://api.github.com/repos/Tsifrokayf/" + repo + "/releases/latest");
         c.setRequestProperty("Accept", "application/vnd.github+json");
         int code = c.getResponseCode();
-        if (code == 404) throw new Exception("релизов пока нет");
-        if (code != 200) throw new Exception("GitHub ответил кодом " + code);
+        if (code == 404) throw new Exception("no releases yet");
+        if (code != 200) throw new Exception("GitHub responded with code " + code);
         String body = new String(readAll(c.getInputStream()), "UTF-8");
         JSONObject o = new JSONObject(body);
         Release r = new Release();
@@ -76,7 +76,7 @@ final class Updater {
         File out = new File(dir, "update.apk");
         HttpURLConnection c = open(url);
         int code = c.getResponseCode();
-        if (code != 200) throw new Exception("загрузка не удалась, код " + code);
+        if (code != 200) throw new Exception("download failed, code " + code);
         long total = c.getContentLengthLong();
         InputStream in = c.getInputStream();
         FileOutputStream fo = new FileOutputStream(out);
@@ -96,7 +96,7 @@ final class Updater {
             fo.close();
             in.close();
         }
-        if (out.length() < 50000) throw new Exception("скачанный файл слишком мал");
+        if (out.length() < 50000) throw new Exception("downloaded file is too small");
         return out;
     }
 
