@@ -1270,7 +1270,7 @@ public class LauncherActivity extends Activity {
         }
         String xml = readXml();
         if (xml == null) {
-            say(Fs.ready() ? "Файл настроек ещё не создан. Запустите игру один раз, затем откройте лаунчер снова." : "Нет доступа к файлам игры (нужен root или Shizuku). Пройдите шаги в карточке «Первичная настройка».");
+            say(Fs.ready() ? (Fs.lastReadError().length() > 0 ? "Не удалось прочитать файл настроек.\n" + Fs.lastReadError() : "Файл настроек ещё не создан. Запустите игру один раз, затем откройте лаунчер снова.") : "Нет доступа к файлам игры (нужен root или Shizuku). Пройдите шаги в карточке «Первичная настройка».");
             resGroup.check(100);
             hudGroup.check(200);
             for (Opt o : opts) {
@@ -1371,7 +1371,7 @@ public class LauncherActivity extends Activity {
         if (!SR3) return applyOther();
         String xml = readXml();
         if (xml == null) {
-            say("Файл настроек игры не найден. Запустите игру один раз.");
+            say(Fs.lastReadError().length() > 0 ? "Не удалось прочитать файл настроек.\n" + Fs.lastReadError() : "Файл настроек игры не найден. Запустите игру один раз.");
             return false;
         }
         if (!Fs.exists(bakPath)) {
@@ -1832,7 +1832,7 @@ public class LauncherActivity extends Activity {
         }
         String xml = readXml();
         if (xml == null) {
-            say(Fs.ready() ? "Файл настроек ещё не создан. Запустите игру один раз, затем откройте лаунчер снова." : "Нет доступа к файлам игры (нужен root или Shizuku). Пройдите шаги в карточке «Первичная настройка».");
+            say(Fs.ready() ? (Fs.lastReadError().length() > 0 ? "Не удалось прочитать файл настроек.\n" + Fs.lastReadError() : "Файл настроек ещё не создан. Запустите игру один раз, затем откройте лаунчер снова.") : "Нет доступа к файлам игры (нужен root или Shizuku). Пройдите шаги в карточке «Первичная настройка».");
             resGroup.check(100);
             hudGroup.check(200);
             loadExtras(null);
@@ -1886,7 +1886,7 @@ public class LauncherActivity extends Activity {
     private boolean applyOther() {
         String xml = readXml();
         if (xml == null) {
-            say("Файл настроек игры не найден. Запустите игру один раз.");
+            say(Fs.lastReadError().length() > 0 ? "Не удалось прочитать файл настроек.\n" + Fs.lastReadError() : "Файл настроек игры не найден. Запустите игру один раз.");
             return false;
         }
         if (!Fs.exists(bakPath)) {

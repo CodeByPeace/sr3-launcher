@@ -191,17 +191,64 @@ final class Fs {
         return sh("test -f " + q(path)) == 0;
     }
 
-    static byte[] read(String path) {
-        if (!ready()) return null;
-        try {
-            Process p = spawn(new String[] {"sh", "-c", "cat " + q(path)});
-            p.getOutputStream().close();
-            byte[] d = drain(p.getInputStream());
-            int rc = p.waitFor();
-            return rc == 0 && d.length > 0 ? d : null;
-        } catch (Throwable t) {
-            return null;
+    private static volatile String lastReadError = "";
+    private static volatile String lastReadVia = "";
+
+    /** Почему последнее чтение не удалось (пусто, если удалось). */
+    static String lastReadError() { return lastReadError; }
+
+    /** Каким путём файл был прочитан в последний раз. */
+    static String lastReadVia() { return lastReadVia; }
+
+    /** Тот же файл по другим путям: Android/data через FUSE и нижележащий слой хранилища. */
+    private static String[] variants(String path) {
+        if (path.startsWith("/sdcard/")) {
+            String rest = path.substring("/sdcard/".length());
+            return new String[] {path, "/storage/emulated/0/" + rest, "/data/media/0/" + rest};
         }
+        return new String[] {path};
+    }
+
+    private static String shOut(String cmd) throws Exception {
+        Process p = spawn(new String[] {"sh", "-c", cmd});
+        p.getOutputStream().close();
+        String out = new String(drain(p.getInputStream()), "UTF-8").trim();
+        p.waitFor();
+        return out;
+    }
+
+    /**
+     * Читает файл, пробуя несколько путей. Чтение засчитывается, только если число
+     * прочитанных байт совпало с размером файла (stat): после первой настройки игры
+     * часть файлов в Android/data копируется как 0 байт без ошибки.
+     * Причина отказа остаётся в lastReadError().
+     */
+    static byte[] read(String path) {
+        lastReadError = "";
+        lastReadVia = "";
+        if (!ready()) { lastReadError = "нет доступа к файлам игры"; return null; }
+        StringBuilder why = new StringBuilder();
+        for (String p : variants(path)) {
+            try {
+                String st = shOut("stat -c %s " + q(p) + " 2>&1");
+                long expect;
+                try { expect = Long.parseLong(st); } catch (NumberFormatException e) {
+                    why.append(p).append(": ").append(st.length() == 0 ? "нет ответа" : st).append("\n");
+                    continue;
+                }
+                if (expect == 0) { why.append(p).append(": файл пустой (0 байт)\n"); continue; }
+                Process pr = spawn(new String[] {"sh", "-c", "cat " + q(p) + " 2>/dev/null"});
+                pr.getOutputStream().close();
+                byte[] d = drain(pr.getInputStream());
+                pr.waitFor();
+                if (d.length == expect) { lastReadVia = p; return d; }
+                why.append(p).append(": прочитано ").append(d.length).append(" из ").append(expect).append(" байт\n");
+            } catch (Throwable t) {
+                why.append(p).append(": ").append(t.getMessage()).append("\n");
+            }
+        }
+        lastReadError = why.toString().trim();
+        return null;
     }
 
     /** Пишет поверх существующего файла (владелец и права сохраняются, игра сможет читать). */
