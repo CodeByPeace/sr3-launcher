@@ -33,6 +33,7 @@ import android.view.animation.Animation;
 import android.view.animation.AlphaAnimation;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -420,14 +421,14 @@ public class LauncherActivity extends Activity {
             setupRow("Or Shizuku installed", "Download the Shizuku app (Google Play or GitHub)", shInst, "Download", new Act() { public void go() { downloadShizuku(); } });
             if (!running) {
                 setupRow("Developer mode enabled",
-                    "Settings → About phone → “Build number”, tap 7 times", dev, "About phone",
+                    "Settings > About phone > “Build number”, tap 7 times", dev, "About phone",
                     new Act() { public void go() { openSettings(Settings.ACTION_DEVICE_INFO_SETTINGS); } });
                 setupRow("Debugging enabled (wireless or USB)",
-                    "Developer options → “Wireless debugging” (needs Wi‑Fi) or “USB debugging”", adb, "Developer options",
+                    "Developer options > “Wireless debugging” (needs Wi‑Fi) or “USB debugging”", adb, "Developer options",
                     new Act() { public void go() { openSettings(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS); } });
             }
             setupRow("Shizuku running",
-                "In Shizuku: “Start via wireless debugging” → “Pairing” → “Start”. After the phone reboots, start it again",
+                "In Shizuku: “Start via wireless debugging” > “Pairing” > “Start”. After the phone reboots, start it again",
                 running, "Open Shizuku", new Act() { public void go() { openShizuku(); } });
             setupRow("Launcher access granted",
                 running ? "Tap “Allow” in the Shizuku window. If there is no window, enable the launcher in Shizuku's app list" : "Start Shizuku first",
@@ -1210,9 +1211,9 @@ public class LauncherActivity extends Activity {
             + "OPTION A: root\nIf you have Magisk, KernelSU or APatch, grant root to the “SR3 Launcher” app and tap “Check root”.\n\n"
             + "OPTION B: Shizuku (no root)\n"
             + "1. Install Shizuku (the “Download Shizuku” button).\n"
-            + "2. Settings → About phone → “Build number”, tap 7 times (developer mode).\n"
-            + "3. Developer options → turn on “Wireless debugging” (needs Wi‑Fi).\n"
-            + "4. In Shizuku: “Start via wireless debugging” → “Pairing”, enter the code from settings, then “Start”.\n"
+            + "2. Settings > About phone > “Build number”, tap 7 times (developer mode).\n"
+            + "3. Developer options > turn on “Wireless debugging” (needs Wi‑Fi).\n"
+            + "4. In Shizuku: “Start via wireless debugging” > “Pairing”, enter the code from settings, then “Start”.\n"
             + "5. Come back to the launcher and tap “Allow” in the Shizuku window.\n\n"
             + "Without root you have to start Shizuku again after every phone reboot.";
         new AlertDialog.Builder(this)
@@ -1238,13 +1239,61 @@ public class LauncherActivity extends Activity {
         return bo.toByteArray();
     }
 
+    /** True when the game's own file could not be read and a stored copy is used instead. */
+    private boolean usingFallback;
+
     private String readXml() {
+        usingFallback = false;
         try {
             byte[] d = Fs.read(prefPath);
-            return d == null ? null : new String(d, "UTF-8");
+            if (d != null) return new String(d, "UTF-8");
+        } catch (Exception ignored) { }
+        String fb = readFallback();
+        if (fb != null) usingFallback = true;
+        return fb;
+    }
+
+    private File fallbackFile() {
+        return new File(getFilesDir(), "last_applied_" + Integer.toHexString(prefPath.hashCode()) + ".xml");
+    }
+
+    /** The last file this launcher wrote; otherwise the bundled template (SR3 only). */
+    private String readFallback() {
+        try {
+            File f = fallbackFile();
+            if (f.exists() && f.length() > 0) {
+                java.io.FileInputStream in = new java.io.FileInputStream(f);
+                try { return new String(readAll(in), "UTF-8"); } finally { in.close(); }
+            }
+        } catch (Exception ignored) { }
+        if (!SR3) return null;
+        try {
+            InputStream in = getAssets().open("prefs_template.xml");
+            try { return new String(readAll(in), "UTF-8"); } finally { in.close(); }
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private static byte[] readAll(InputStream in) throws IOException {
+        ByteArrayOutputStream bo = new ByteArrayOutputStream();
+        byte[] b = new byte[8192];
+        int n;
+        while ((n = in.read(b)) > 0) bo.write(b, 0, n);
+        return bo.toByteArray();
+    }
+
+    private void rememberApplied(String xml) {
+        try {
+            java.io.FileOutputStream o = new java.io.FileOutputStream(fallbackFile());
+            try { o.write(xml.getBytes(java.nio.charset.StandardCharsets.UTF_8)); } finally { o.close(); }
+        } catch (Exception ignored) { }
+    }
+
+    private boolean writePrefs(String xml) {
+        boolean ok = writeBytes(prefPath, xml.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        if (ok) rememberApplied(xml);
+        return ok;
     }
 
     private boolean writeBytes(String path, byte[] data) {
@@ -1345,7 +1394,7 @@ public class LauncherActivity extends Activity {
         upSharpSeek.setProgress((int) Math.round(us * 100));
         swCasPs.setChecked("1".equals(PrefsEditor.getInKey(xml, "CASUsePixelShader", up)));
         loadExtras(xml);
-        say(Fs.exists(bakPath) ? "Original settings saved, you can restore them." : "Settings loaded.");
+        say(usingFallback ? "Can't read the game's settings file, so this shows the last settings saved by the launcher (or the built-in defaults). Saving overwrites the game's file.\n" + Fs.lastReadError() : Fs.exists(bakPath) ? "Original settings saved, you can restore them." : "Settings loaded.");
     }
 
     private static boolean sameValue(String a, String b, String type) {
@@ -1374,7 +1423,7 @@ public class LauncherActivity extends Activity {
             say(Fs.lastReadError().length() > 0 ? "Couldn't read the settings file.\n" + Fs.lastReadError() : "Game settings file not found. Launch the game once.");
             return false;
         }
-        if (!Fs.exists(bakPath)) {
+        if (!usingFallback && !Fs.exists(bakPath)) {
             try { writeBytes(bakPath, xml.getBytes("UTF-8")); } catch (Exception ignored) { }
         }
 
@@ -1435,7 +1484,7 @@ public class LauncherActivity extends Activity {
         xml = PrefsEditor.setInKey(xml, "CompactFeralGUI", "integer", hud == 1 ? "1" : "0", D3D_CONFIG);
 
         try {
-            if (!writeBytes(prefPath, xml.getBytes("UTF-8"))) {
+            if (!writePrefs(xml)) {
                 say("Couldn't write the settings file.");
                 return false;
             }
@@ -1880,7 +1929,7 @@ public class LauncherActivity extends Activity {
             swCasPs.setChecked("1".equals(PrefsEditor.getInKey(xml, "CASUsePixelShader", up)));
         }
         loadExtras(xml);
-        say(Fs.exists(bakPath) ? "Original settings saved, you can restore them." : "Settings loaded.");
+        say(usingFallback ? "Can't read the game's settings file, so this shows the last settings saved by the launcher (or the built-in defaults). Saving overwrites the game's file.\n" + Fs.lastReadError() : Fs.exists(bakPath) ? "Original settings saved, you can restore them." : "Settings loaded.");
     }
 
     private boolean applyOther() {
@@ -1889,7 +1938,7 @@ public class LauncherActivity extends Activity {
             say(Fs.lastReadError().length() > 0 ? "Couldn't read the settings file.\n" + Fs.lastReadError() : "Game settings file not found. Launch the game once.");
             return false;
         }
-        if (!Fs.exists(bakPath)) {
+        if (!usingFallback && !Fs.exists(bakPath)) {
             try { writeBytes(bakPath, xml.getBytes("UTF-8")); } catch (Exception ignored) { }
         }
         int rid = resGroup.getCheckedRadioButtonId();
@@ -1958,7 +2007,7 @@ public class LauncherActivity extends Activity {
         xml = PrefsEditor.setInKey(xml, "CompactFeralGUI", "integer", hud == 1 ? "1" : "0", D3D_CONFIG);
 
         try {
-            if (!writeBytes(prefPath, xml.getBytes("UTF-8"))) {
+            if (!writePrefs(xml)) {
                 say("Couldn't write the settings file.");
                 return false;
             }

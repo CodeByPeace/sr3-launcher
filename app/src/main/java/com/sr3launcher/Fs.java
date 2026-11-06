@@ -242,7 +242,8 @@ final class Fs {
                 byte[] d = drain(pr.getInputStream());
                 pr.waitFor();
                 if (d.length == expect) { lastReadVia = p; return d; }
-                why.append(p).append(": read ").append(d.length).append(" of ").append(expect).append(" bytes\n");
+                String err = shOut("cat " + q(p) + " 2>&1 >/dev/null");
+                why.append(p).append(": read ").append(d.length).append(" of ").append(expect).append(" bytes").append(err.length() > 0 ? " (" + err + ")" : "").append("\n");
             } catch (Throwable t) {
                 why.append(p).append(": ").append(t.getMessage()).append("\n");
             }

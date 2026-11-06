@@ -116,7 +116,7 @@ final class Perf {
 
     // ---- приоритет
 
-    static final String[] PRIO_LABELS = {"Normal (don't change)", "Raised (−5)", "High (−10)", "Low (+5)"};
+    static final String[] PRIO_LABELS = {"Normal (don't change)", "Raised (-5)", "High (-10)", "Low (+5)"};
     static final int[] PRIO_NICE = {0, -5, -10, 5};
 
     /**

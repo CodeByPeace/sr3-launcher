@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<registry>
+    <key name="HKEY_CLASSES_ROOT">
+    </key>
+    <key name="HKEY_CURRENT_CONFIG">
+    </key>
+    <key name="HKEY_CURRENT_USER">
+        <key name="AutoValueRemap">
+            <key name="GPURemap">
+                <key name="keys">
+                    <value name="Software\IndirectX\Direct3D\Config" type="integer">1</value>
+                </key>
+                <key name="values">
+                    <value name="Software\Feral Interactive\Saints Row The Third\Setup\FullScreen" type="integer">1</value>
+                    <value name="Software\Feral Interactive\Saints Row The Third\Setup\ScreenH" type="integer">1</value>
+                    <value name="Software\Feral Interactive\Saints Row The Third\Setup\ScreenW" type="integer">1</value>
+                </key>
+            </key>
+        </key>
+        <key name="Software">
+            <key name="CloudDrive">
+                <key name="Config">
+                    <value name="CloudSyncVersion" type="double">1.000000</value>
+                    <value name="CloudUseCellularAlert" type="integer">1</value>
+                    <value name="CloudUseDisabledAlert" type="integer">1</value>
+                    <value name="CloudUseOfflineMode" type="integer">0</value>
+                </key>
+            </key>
+            <key name="Feral Interactive">
+                <key name="Saints Row The Third">
+                    <key name="Setup">
+                        <value name="AddSteamCloudAlias" type="integer">1</value>
+                        <value name="AllowAutorotate" type="integer">0</value>
+                        <value name="AllowPausing" type="integer">1</value>
+                        <value name="AllowPushNotifications" type="integer">1</value>
+                        <value name="AllowSendCrashReports" type="integer">0</value>
+                        <value name="AllowSendUsageData" type="integer">0</value>
+                        <value name="AllowTapWithOtherGestures" type="integer">1</value>
+                        <value name="CalicoRefreshKeychain" type="integer">1</value>
+                        <value name="CardRenderer" type="string">Adreno (TM) 810 2405MB</value>
+                        <value name="ConstantAmplitudeHaptics" type="integer">1</value>
+                        <value name="DeferSupportAssetLoad" type="integer">1</value>
+                        <value name="DisableFeralNetOverlay" type="integer">1</value>
+                        <value name="DisableOSShortcuts" type="integer">1</value>
+                        <value name="DisableRemoteResources" type="integer">0</value>
+                        <value name="DisplayControlsPrompt" type="integer">1</value>
+                        <value name="DoneMinOS" type="integer">0</value>
+                        <value name="DonePromotional" type="integer">0</value>
+                        <value name="DoneUnsupported" type="integer">0</value>
+                        <value name="DoShowBatteryOptimisationsWarning" type="integer">1</value>
+                        <value name="EnableTapAnywhereContextAction" type="integer">1</value>
+                        <value name="EscBackButton" type="integer">1</value>
+                        <value name="FeralAnalyticsInstallID" type="string">aV+xcRAJSolAeychHiVJqj66</value>
+                        <value name="FirstLaunch" type="integer">0</value>
+                        <value name="FirstLaunchSinceUpdate" type="integer">0</value>
+                        <value name="FixedScreenHeight" type="integer">720</value>
+                        <value name="ForceTouchControls" type="integer">1</value>
+                        <value name="FullScreen" type="integer">1</value>
+                        <value name="GameInstallVersion" type="integer">16777984</value>
+                        <value name="GameInstallVersionString" type="string">Saints Row: The Third v1.0.3</value>
+                        <value name="GameInstallVersionWithStages" type="integer">17006592</value>
+                        <value name="GameOptionsDialogShouldShow" type="integer">0</value>
+                        <value name="GameOptionsDialogShown" type="integer">1</value>
+                        <value name="GamepadSupportEnabled" type="integer">1</value>
+                        <value name="GameVersionNew" type="integer">16777984</value>
+                        <value name="GameVersionString" type="string">Saints Row: The Third v1.0.3</value>
+                        <value name="GesturePressMinDuration" type="double">0.400000</value>
+                        <value name="GfxAvailableOverrideFps" type="array">30,40,60,90,120</value>
+                        <value name="GfxEnableHighResCharacters" type="integer">0</value>
+                        <value name="GfxFadeDistMultiplier" type="double">1.000000</value>
+                        <value name="GfxPerformancePresetAvailable" type="integer">0</value>
+                        <value name="HapticControllerFallbackToDevice" type="integer">1</value>
+                        <value name="HasSimilarHardwareToSupportedDevice" type="integer">1</value>
+                        <value name="IsLanguageAutoDetectSelected" type="integer">0</value>
+                        <value name="IsSingleSaveFileSystem" type="integer">1</value>
+                        <value name="LaunchSendUsageDataAnalyticsSent" type="integer">1</value>
+                        <value name="MouseCursorIconScale" type="double">1.000000</value>
+                        <value name="PauseMoviesOnPause" type="integer">1</value>
+                        <value name="PauseOnSuspend" type="integer">1</value>
+                        <value name="PauseSoundOnPause" type="integer">1</value>
+                        <value name="PauseTimersOnPause" type="integer">1</value>
+                        <value name="PreregisterVcpSlot" type="integer">1</value>
+                        <value name="RenderUnderNotch" type="integer">1</value>
+                        <value name="RequireStrictDataCheck" type="integer">0</value>
+                        <value name="RestartOnUIModeChange" type="integer">0</value>
+                        <value name="RmlDPRatioVersion" type="integer">3</value>
+                        <value name="RmlIsBatchingEnabled" type="integer">1</value>
+                        <value name="RmlPackTexturesIntoAtlas" type="integer">1</value>
+                        <value name="RmlRootVFSPath" type="string">feral</value>
+                        <value name="ScreenDensityMax" type="integer">320</value>
+                        <value name="ScreenH" type="integer">720</value>
+                        <value name="ScreenW" type="integer">1576</value>
+                        <value name="SeenSpecificationAlertUUIDAdreno_81x_Defaults" type="integer">1</value>
+                        <value name="SeenSpecificationAlertUUIDAdreno_81x_Defaults_1_0_3_SR3_3106" type="integer">1</value>
+                        <value name="SeenSpecificationAlertUUIDDefaults_1_0_3_SR3_3106" type="integer">1</value>
+                        <value name="SeenSpecificationAlertUUIDSR3_3103_workaround_1_0_3RC4" type="integer">1</value>
+                        <value name="SeenSpecificationAlertUUIDSR3_3107_workaround_1_0_3RC4" type="integer">1</value>
+                        <value name="SeenSpecificationAlertUUIDUntestedCapableHardware" type="integer">1</value>
+                        <value name="SpecificationFirstLaunchCheck" type="integer">1</value>
+                        <value name="SpecificationLastUpdateCheckTime" type="binary">f48eeb6a00000000</value>
+                        <value name="SpecificationUpdateURL" type="string">https://u1.feralinteractive.com/autoupdate/saintsrow3/specifications_android_1_0_3.xml</value>
+                        <value name="TotalLaunchCount" type="integer">11</value>
+                        <value name="UpdateServerDomain" type="string">u1.feralinteractive.com</value>
+                        <value name="UpdateServerPath" type="string">/autoupdate/</value>
+                        <value name="UpdateServerProtocol" type="string">https://</value>
+                        <value name="UseDriveSaveSync" type="integer">0</value>
+                        <value name="UseGoogleSignIn" type="integer">1</value>
+                        <value name="UseOfflineEvents" type="integer">1</value>
+                        <value name="UseRMLDataDownloadUI" type="integer">0</value>
+                        <key name="BatterySaverPreset">
+                            <value name="GfxAA" type="string">fxaa</value>
+                            <value name="GfxAnisotropic" type="string">4x</value>
+                            <value name="GfxCubemapReflections" type="integer">0</value>
+                            <value name="GfxCubemapSpecFadeDistSqEnd" type="double">5000.000000</value>
+                            <value name="GfxCubemapSpecFadeDistSqStart" type="double">3000.000000</value>
+                            <value name="GfxIdleFps" type="integer">30</value>
+                            <value name="GfxLighting" type="string">low</value>
+                            <value name="GfxLodMultiplier" type="double">0.850000</value>
+                            <value name="GfxMaxScaling" type="double">0.800000</value>
+                            <value name="GfxMinScaling" type="double">0.600000</value>
+                            <value name="GfxResolutionScale" type="double">1.000000</value>
+                            <value name="GfxResponsiveFps" type="integer">30</value>
+                            <value name="GfxSceneCharacters" type="string">low</value>
+                            <value name="GfxSceneMeshes" type="string">low</value>
+                            <value name="GfxSceneTrees" type="string">low</value>
+                            <value name="GfxSceneUndergrowth" type="string">low</value>
+                            <value name="GfxSceneVehicles" type="string">low</value>
+                            <value name="GfxSceneVFX" type="string">low</value>
+                            <value name="GfxShadow" type="string">low</value>
+                            <value name="GfxSharpen" type="double">0.300000</value>
+                            <value name="GfxSSAO" type="string">off</value>
+                            <value name="GfxSSLR" type="string">off</value>
+                            <value name="GfxVolumetricFog" type="string">off</value>
+                        </key>
+                        <key name="DocumentNavigation">
+                            <value name="WASDNavigationEnabled" type="integer">1</value>
+                        </key>
+                        <key name="DynamicResolutionScaling">
+                            <value name="CPUFrameTimeSmoothing" type="integer">10</value>
+                            <value name="DropDelayFrames" type="integer">6</value>
+                            <value name="DropTimeMargin" type="double">-1.250000</value>
+                            <value name="Enable" type="integer">1</value>
+                            <value name="FastDropTimeMargin" type="double">-2.500000</value>
+                            <value name="FPSTarget" type="double">30.000000</value>
+                            <value name="MaxScaling" type="double">0.800000</value>
+                            <value name="MinScaling" type="double">0.600000</value>
+                            <value name="RaiseDelayFrames" type="integer">4</value>
+                            <value name="RaiseDelayFramesInRace" type="integer">4</value>
+                            <value name="RaiseTimeMargin" type="double">0.250000</value>
+                            <value name="StepCount" type="integer">5</value>
+                            <value name="SyncWithFramerateManager" type="integer">1</value>
+                            <value name="UseGPUTime" type="integer">1</value>
+                        </key>
+                        <key name="GameOptions">
+                            <value name="AirplaneAssist" type="integer">1</value>
+                            <value name="Brightness" type="integer">100</value>
+                            <value name="CrouchToggle" type="integer">0</value>
+                            <value name="EffectsVolume" type="integer">80</value>
+                            <value name="GamepadHorzSens" type="integer">50</value>
+                            <value name="GamepadInvertRot" type="integer">0</value>
+                            <value name="GamepadInvertY" type="integer">0</value>
+                            <value name="GamepadVehicleSnap" type="integer">0</value>
+                            <value name="GamepadVertSens" type="integer">50</value>
+                            <value name="GameplayVibration" type="integer">1</value>
+                            <value name="GfxAdvancedGraphics" type="integer">1</value>
+                            <value name="GfxDoF" type="string">off</value>
+                            <value name="GfxFilmGrain" type="string">off</value>
+                            <value name="GfxMobilePreset" type="string">battery</value>
+                            <value name="GfxMotionBlur" type="string">off</value>
+                            <value name="GfxOverrideFps" type="integer">30</value>
+                            <value name="GfxOverrideFpsEnabled" type="integer">1</value>
+                            <value name="KbmInvertX" type="integer">0</value>
+                            <value name="KbmInvertY" type="integer">0</value>
+                            <value name="KbmVehicleSnap" type="integer">2</value>
+                            <value name="KbmXSens" type="integer">15</value>
+                            <value name="KbmYSens" type="integer">15</value>
+                            <value name="MinimapStatic" type="integer">0</value>
+                            <value name="MusicVolume" type="integer">80</value>
+                            <value name="OverallVolume" type="integer">100</value>
+                            <value name="Subtitles" type="integer">1</value>
+                            <value name="VcpAimLockOnlyIfAiming" type="integer">1</value>
+                            <value name="VcpAimLockOnlyIfMoving" type="integer">1</value>
+                            <value name="VcpEnableGyroControls" type="integer">0</value>
+                            <value name="VcpEnableIntegratedSteering" type="integer">0</value>
+                            <value name="VcpMoveStickLocationIsDynamic" type="integer">1</value>
+                            <value name="VehicleRadio" type="integer">0</value>
+                            <value name="VoiceVolume" type="integer">80</value>
+                        </key>
+                        <key name="GraphicsPreset">
+                            <value name="GfxAA" type="string">fxaa</value>
+                            <value name="GfxAnisotropic" type="string">4x</value>
+                            <value name="GfxCubemapReflections" type="integer">0</value>
+                            <value name="GfxCubemapSpecFadeDistSqEnd" type="double">5000.000000</value>
+                            <value name="GfxCubemapSpecFadeDistSqStart" type="double">3000.000000</value>
+                            <value name="GfxIdleFps" type="integer">30</value>
+                            <value name="GfxLighting" type="string">low</value>
+                            <value name="GfxLodMultiplier" type="double">0.850000</value>
+                            <value name="GfxMaxScaling" type="double">0.800000</value>
+                            <value name="GfxMinScaling" type="double">0.600000</value>
+                            <value name="GfxResolutionScale" type="double">1.000000</value>
+                            <value name="GfxResponsiveFps" type="integer">30</value>
+                            <value name="GfxSceneCharacters" type="string">low</value>
+                            <value name="GfxSceneMeshes" type="string">low</value>
+                            <value name="GfxSceneTrees" type="string">low</value>
+                            <value name="GfxSceneUndergrowth" type="string">low</value>
+                            <value name="GfxSceneVehicles" type="string">low</value>
+                            <value name="GfxSceneVFX" type="string">low</value>
+                            <value name="GfxShadow" type="string">low</value>
+                            <value name="GfxSharpen" type="double">0.300000</value>
+                            <value name="GfxSSAO" type="string">off</value>
+                            <value name="GfxSSLR" type="string">off</value>
+                            <value name="GfxVolumetricFog" type="string">off</value>
+                        </key>
+                        <key name="MemoryFlags">
+                            <value name="UseFileBackedMemory" type="integer">0</value>
+                        </key>
+                        <key name="MotionAimSettings">
+                            <value name="DeltaThresholdX" type="double">0.000100</value>
+                            <value name="DeltaThresholdY" type="double">0.000050</value>
+                            <value name="Enabled" type="integer">0</value>
+                            <value name="OffsetThresholdX" type="double">20.000000</value>
+                            <value name="OffsetThresholdY" type="double">40.000000</value>
+                            <value name="SensitivityX" type="double">400.000000</value>
+                            <value name="SensitivityY" type="double">400.000000</value>
+                            <value name="SmoothFrames" type="integer">3</value>
+                            <value name="SpeedAttenuation" type="double">0.000000</value>
+                            <value name="SpeedLimit" type="double">0.000000</value>
+                        </key>
+                        <key name="PerformancePreset">
+                            <value name="GfxAA" type="string">fxaa</value>
+                            <value name="GfxAnisotropic" type="string">4x</value>
+                            <value name="GfxCubemapReflections" type="integer">0</value>
+                            <value name="GfxCubemapSpecFadeDistSqEnd" type="double">5000.000000</value>
+                            <value name="GfxCubemapSpecFadeDistSqStart" type="double">3000.000000</value>
+                            <value name="GfxIdleFps" type="integer">30</value>
+                            <value name="GfxLighting" type="string">low</value>
+                            <value name="GfxLodMultiplier" type="double">0.850000</value>
+                            <value name="GfxMaxScaling" type="double">0.800000</value>
+                            <value name="GfxMinScaling" type="double">0.600000</value>
+                            <value name="GfxResolutionScale" type="double">1.000000</value>
+                            <value name="GfxResponsiveFps" type="integer">30</value>
+                            <value name="GfxSceneCharacters" type="string">low</value>
+                            <value name="GfxSceneMeshes" type="string">low</value>
+                            <value name="GfxSceneTrees" type="string">low</value>
+                            <value name="GfxSceneUndergrowth" type="string">low</value>
+                            <value name="GfxSceneVehicles" type="string">low</value>
+                            <value name="GfxSceneVFX" type="string">low</value>
+                            <value name="GfxShadow" type="string">low</value>
+                            <value name="GfxSharpen" type="double">0.300000</value>
+                            <value name="GfxSSAO" type="string">off</value>
+                            <value name="GfxSSLR" type="string">off</value>
+                            <value name="GfxVolumetricFog" type="string">off</value>
+                        </key>
+                        <key name="SpecificationAlerts">
+                            <value name="Defaults" type="integer">1</value>
+                        </key>
+                    </key>
+                </key>
+            </key>
+            <key name="IndirectX">
+                <key name="Direct3D">
+                    <key name="Config">
+                        <value name="CompactFeralGUI" type="integer">1</value>
+                        <value name="EnableF3DWarmer" type="integer">1</value>
+                        <value name="EnableFramerateManager" type="integer">1</value>
+                        <value name="EnableIdxD3D11Threaded" type="integer">1</value>
+                        <value name="EnableShaderDeduplicator" type="integer">1</value>
+                        <value name="FeralGUIWatermarkText" type="string"></value>
+                        <value name="FramerateManagerResponsiveFPSDuration" type="integer">5000</value>
+                        <value name="IdxD3D11ThreadedMaxQueuedFrames" type="integer">0</value>
+                        <value name="ShowFeralGUI" type="integer">1</value>
+                        <value name="ShowFeralGUIWatermark" type="integer">0</value>
+                        <value name="SingleThreadedWarmer" type="integer">1</value>
+                        <value name="VulkanRenderToBackbuffer" type="integer">1</value>
+                        <value name="VulkanUseSecondaryCmdBuffersForGraphicsPass" type="integer">0</value>
+                        <value name="VulkanUseSeparateSubmitThread" type="integer">1</value>
+                    </key>
+                </key>
+                <key name="DirectInput">
+                    <key name="Config">
+                        <value name="EnumerateDirectInputDevicesOnMobile" type="integer">1</value>
+                    </key>
+                </key>
+            </key>
+            <key name="MacDoze">
+                <key name="Config">
+                    <value name="ClearSavesEnabled" type="integer">0</value>
+                    <value name="DisableClearSaveDataAlert" type="integer">0</value>
+                </key>
+            </key>
+            <key name="SessionAnalytics">
+                <value name="DaysSinceFirstRun" type="integer">0</value>
+                <value name="Enabled" type="integer">1</value>
+                <value name="FirstLaunchTime" type="integer">815469435</value>
+                <value name="HoursSinceFirstLaunch" type="integer">0</value>
+                <value name="LongestSessionPlaytimeInForeground" type="integer">0</value>
+                <value name="NumberOfSessionBackgrounds" type="integer">0</value>
+                <value name="PlaytimeSinceInstall" type="integer">0</value>
+                <value name="TotalSessionForeground" type="integer">0</value>
+                <value name="TotalSessionTime" type="integer">0</value>
+            </key>
+            <key name="SystemMonitor">
+                <key name="Config">
+                    <value name="AppVersion" type="integer">16777984</value>
+                    <value name="Backgrounded" type="integer">0</value>
+                    <value name="OSVersion" type="string">16.0</value>
+                    <value name="QuitIntentional" type="integer">0</value>
+                </key>
+            </key>
+        </key>
+    </key>
+    <key name="HKEY_LOCAL_MACHINE">
+        <key name="Hardware">
+            <key name="Description">
+                <key name="System">
+                    <key name="CentralProcessor">
+                        <key name="0">
+                            <value name="Identifier" type="string">SM7635</value>
+                            <value name="ProcessorNameString" type="string">SM7635</value>
+                            <value name="VendorIdentifier" type="string">Arm Limited</value>
+                            <value name="~MHz" type="integer">1804</value>
+                        </key>
+                        <key name="1">
+                            <value name="Identifier" type="string">SM7635</value>
+                            <value name="ProcessorNameString" type="string">SM7635</value>
+                            <value name="VendorIdentifier" type="string">Arm Limited</value>
+                            <value name="~MHz" type="integer">1804</value>
+                        </key>
+                        <key name="2">
+                            <value name="Identifier" type="string">SM7635</value>
+                            <value name="ProcessorNameString" type="string">SM7635</value>
+                            <value name="VendorIdentifier" type="string">Arm Limited</value>
+                            <value name="~MHz" type="integer">1804</value>
+                        </key>
+                        <key name="3">
+                            <value name="Identifier" type="string">SM7635</value>
+                            <value name="ProcessorNameString" type="string">SM7635</value>
+                            <value name="VendorIdentifier" type="string">Arm Limited</value>
+                            <value name="~MHz" type="integer">1804</value>
+                        </key>
+                        <key name="4">
+                            <value name="Identifier" type="string">SM7635</value>
+                            <value name="ProcessorNameString" type="string">SM7635</value>
+                            <value name="VendorIdentifier" type="string">Arm Limited</value>
+                            <value name="~MHz" type="integer">1804</value>
+                        </key>
+                        <key name="5">
+                            <value name="Identifier" type="string">SM7635</value>
+                            <value name="ProcessorNameString" type="string">SM7635</value>
+                            <value name="VendorIdentifier" type="string">Arm Limited</value>
+                            <value name="~MHz" type="integer">1804</value>
+                        </key>
+                        <key name="6">
+                            <value name="Identifier" type="string">SM7635</value>
+                            <value name="ProcessorNameString" type="string">SM7635</value>
+                            <value name="VendorIdentifier" type="string">Arm Limited</value>
+                            <value name="~MHz" type="integer">1804</value>
+                        </key>
+                        <key name="7">
+                            <value name="Identifier" type="string">SM7635</value>
+                            <value name="ProcessorNameString" type="string">SM7635</value>
+                            <value name="VendorIdentifier" type="string">Arm Limited</value>
+                            <value name="~MHz" type="integer">1804</value>
+                        </key>
+                    </key>
+                </key>
+            </key>
+        </key>
+        <key name="Software">
+        </key>
+    </key>
+    <key name="HKEY_USERS">
+    </key>
+</registry>
