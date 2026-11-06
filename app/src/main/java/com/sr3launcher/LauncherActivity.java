@@ -1275,14 +1275,6 @@ public class LauncherActivity extends Activity {
         }
     }
 
-    private static byte[] readAll(InputStream in) throws IOException {
-        ByteArrayOutputStream bo = new ByteArrayOutputStream();
-        byte[] b = new byte[8192];
-        int n;
-        while ((n = in.read(b)) > 0) bo.write(b, 0, n);
-        return bo.toByteArray();
-    }
-
     private void rememberApplied(String xml) {
         try {
             java.io.FileOutputStream o = new java.io.FileOutputStream(fallbackFile());
