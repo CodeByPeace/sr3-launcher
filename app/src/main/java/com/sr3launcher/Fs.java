@@ -252,18 +252,52 @@ final class Fs {
         return null;
     }
 
-    /** Пишет поверх существующего файла (владелец и права сохраняются, игра сможет читать). */
+    private static volatile String lastWriteError = "";
+
+    /** Why the last write failed (empty if it worked). */
+    static String lastWriteError() { return lastWriteError; }
+
+    private static String pipe(String cmd, byte[] data, int[] rc) throws Exception {
+        Process p = spawn(new String[] {"sh", "-c", cmd});
+        OutputStream o = p.getOutputStream();
+        try { o.write(data); o.flush(); } catch (Exception ignored) { }
+        try { o.close(); } catch (Exception ignored) { }
+        String out = new String(drain(p.getInputStream()), "UTF-8").trim();
+        rc[0] = p.waitFor();
+        return out;
+    }
+
+    /**
+     * Writes over the file in place; if the game's file refuses that (it was created with
+     * owner-only permissions), writes a temp file next to it and renames it over the original.
+     */
     static boolean write(String path, byte[] data) {
-        if (!ready()) return false;
+        lastWriteError = "";
+        if (!ready()) { lastWriteError = "no access to the game files"; return false; }
+        StringBuilder why = new StringBuilder();
         try {
-            Process p = spawn(new String[] {"sh", "-c", "cat > " + q(path)});
-            OutputStream o = p.getOutputStream();
-            o.write(data);
-            o.flush();
-            o.close();
-            drain(p.getInputStream());
-            return p.waitFor() == 0;
+            int[] rc = new int[1];
+            String out = pipe("{ cat > " + q(path) + "; } 2>&1", data, rc);
+            if (rc[0] == 0) return true;
+            why.append("in place: ").append(out.length() == 0 ? "exit " + rc[0] : out).append("\n");
+            String tmp = path + ".sr3tmp";
+            out = pipe("{ cat > " + q(tmp) + " && chmod 660 " + q(tmp) + " && mv -f " + q(tmp) + " " + q(path)
+                    + "; } 2>&1 || { rm -f " + q(tmp) + "; exit 1; }", data, rc);
+            if (rc[0] != 0) {
+                why.append("replace: ").append(out.length() == 0 ? "exit " + rc[0] : out);
+                lastWriteError = why.toString().trim();
+                return false;
+            }
+            String sz = shOut("stat -c %s " + q(path) + " 2>&1");
+            if (!sz.equals(String.valueOf(data.length))) {
+                why.append("replaced, but the file size is ").append(sz).append(" instead of ").append(data.length);
+                lastWriteError = why.toString().trim();
+                return false;
+            }
+            return true;
         } catch (Throwable t) {
+            why.append(t.getMessage());
+            lastWriteError = why.toString().trim();
             return false;
         }
     }

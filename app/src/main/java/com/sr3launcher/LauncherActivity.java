@@ -1477,7 +1477,7 @@ public class LauncherActivity extends Activity {
 
         try {
             if (!writePrefs(xml)) {
-                say("Couldn't write the settings file.");
+                say("Couldn't write the settings file.\n" + Fs.lastWriteError());
                 return false;
             }
         } catch (Exception e) {
@@ -2000,7 +2000,7 @@ public class LauncherActivity extends Activity {
 
         try {
             if (!writePrefs(xml)) {
-                say("Couldn't write the settings file.");
+                say("Couldn't write the settings file.\n" + Fs.lastWriteError());
                 return false;
             }
         } catch (Exception e) {
